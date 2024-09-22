@@ -225,14 +225,16 @@ export default {
       campaigns: 'campaigns/getAllCampaigns',
       labels: 'labels/getLabels',
       selectedConversations: 'bulkActions/getSelectedConversationIds',
-      contextMenuChatId: 'getContextMenuChatId',
       isFeatureEnabledonAccount: 'accounts/isFeatureEnabledonAccount',
       currentRole: 'getCurrentRole',
       accountId: 'getCurrentAccountId',
     }),
+    currentRoleIsAdministrator() {
+      return this.currentRole === 'administrator';
+    },
     hideAllChatsForAgents() {
       return (
-        this.currentRole !== 'administrator' &&
+        !this.currentRoleIsAdministrator &&
         this.isFeatureEnabledonAccount(
           this.accountId,
           'hide_all_chats_for_agent'
@@ -241,7 +243,7 @@ export default {
     },
     hideUnassingnedForAgents() {
       return (
-        this.currentRole !== 'administrator' &&
+        !this.currentRoleIsAdministrator &&
         this.isFeatureEnabledonAccount(
           this.accountId,
           'hide_unassigned_for_agent'
@@ -250,7 +252,7 @@ export default {
     },
     hideFiltersForAgents() {
       return (
-        this.currentRole !== 'administrator' &&
+        !this.currentRoleIsAdministrator &&
         this.isFeatureEnabledonAccount(this.accountId, 'hide_filters_for_agent')
       );
     },
@@ -287,11 +289,11 @@ export default {
         item => item.permissions
       )
         .filter(({ key }) => {
-          if (this.hideAllChatsForAgents) {
-            return key !== 'allCount';
+          if (this.hideAllChatsForAgents && key === 'all') {
+            return false;
           }
-          if (this.hideUnassingnedForAgents) {
-            return key !== 'unAssignedCount';
+          if (this.hideUnassingnedForAgents && key === 'unassigned') {
+            return false;
           }
           return true;
         })
